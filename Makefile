@@ -6,7 +6,7 @@ INCLUDES	:= .
 
 VITASDK		:= C:\vitasdk
 
-LIBS = -lSDL_mixer -lSDL_image -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
+LIBS = -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
 	-lSceAppMgr_stub -lSceCtrl_stub -lSceTouch_stub -lm -lSceAppUtil_stub -lScePgf_stub -ljpeg \
 	-lfreetype -lc -lScePower_stub -lSceCommonDialog_stub -lpng16 -lz -lSceAudio_stub -lSceGxm_stub \
 	-lSceDisplay_stub -lSceSysmodule_stub -lSDL2 -lvita2d -lSceHid_stub
