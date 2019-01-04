@@ -460,24 +460,16 @@ extern const char *FindCorrectFile(const char *_pszName, const char *pszMode)
     static char finalname[PATH_MAX];
     static bool bail_early = true;
 
-    if (nohomedir)
-        strcpy(finalname, pszName);
+	if (pszName[0] == '.' && pszName[1] == '/') sprintf(finalname, "ux0:data/postal/%s", &pszName[2]);
+	else sprintf(finalname, "ux0:data/postal/%s", pszName);
 
-    else if ((strlen(pszName) + strlen(prefpath)) > sizeof (finalname))
-        strcpy(finalname, pszName); // oh well.
-
-    else
-    {
-        bail_early = false;
-        sprintf(finalname, "%s%s", prefpath, pszName);
-    }
-
-    locateCorrectCase(finalname);
-
+    //locateCorrectCase(finalname);
+	TRACE("finalname is \"%s\"\n", finalname);
+	
     if (bail_early)  // don't choose between prefpath and basedir?
         return(finalname);
 
-    // writing? Always use prefpath.
+    /*// writing? Always use prefpath.
     if (strcspn(pszMode, "aAwW+") < strlen(pszMode))
     {
         // build directories...
@@ -532,7 +524,7 @@ extern const char *FindCorrectFile(const char *_pszName, const char *pszMode)
 	
 	TRACE("finalname is \"%s\"\n", finalname);
 
-    return finalname;
+    return finalname;*/
 }
 
 
