@@ -154,6 +154,11 @@
 #include "WishPiX/Menu/menu.h"
 #endif
 
+#ifdef PSP2
+#include <vitasdk.h>
+int _newlib_heap_size_user = 192 * 1024 * 1024;
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Macros/types/etc.
 ////////////////////////////////////////////////////////////////////////////////
@@ -756,6 +761,14 @@ void RunSteamworksUpkeep()
 
 int main(int argc, char **argv)
 	{
+		
+	#ifdef PSP2
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
+	#endif
+	
 	int16_t sResult = 0;
 
     _argc = argc;
