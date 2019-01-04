@@ -596,7 +596,7 @@ static SDL_Renderer *createRendererToggleVsync(SDL_Window *window, const int ind
 {
     SDL_Renderer *retval = NULL;
 	
-#ifdef SWITCH	
+#ifdef PSP2	
 	retval = SDL_CreateRenderer(window, index, SDL_RENDERER_SOFTWARE);
 #else
     if (vsync)
@@ -665,7 +665,7 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
         //ASSERT(sDeviceWidth == 0);
         //ASSERT(sDeviceHeight == 0);
         //ASSERT(sWidth == 640);
-        ASSERT(sHeight == 480);
+        //ASSERT(sHeight == 480);
 
         for (size_t i = 0; i < 256; i++)
             apeApp[i].a = 0xFF;
