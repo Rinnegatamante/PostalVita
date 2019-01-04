@@ -130,7 +130,7 @@ extern void rspDoSystem(void)										// Returns nothing.
         RunSteamworksUpkeep();
         #endif
 
-        SDL_Event event;
+        /*SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -157,7 +157,7 @@ extern void rspDoSystem(void)										// Returns nothing.
                     rspSetQuitStatus(1);
                     break;
             }
-        }
+        }*/
 	}
 
 //////////////////////////////////////////////////////////////////////////////
