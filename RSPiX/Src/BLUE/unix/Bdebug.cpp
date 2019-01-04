@@ -113,7 +113,7 @@ char* Debug_FileName(char* pszPath)
 void rspTrace(char *frmt, ... )
 	{
  
-#if 0 
+#ifdef _DEBUG 
 		va_list varp;
 		  
 		va_start(varp, frmt);    
@@ -130,7 +130,7 @@ void rspTrace(char *frmt, ... )
 		{
 		// Attempt to open (Note that we never close this -- the system does).
 		// This will probably show up as a leak.
-		fs	= fopen("TRACE.TXT", "a+");
+		fs	= fopen("ux0:data/postal/TRACE.TXT", "a+");
 		if (fs)
 		{
 			 
@@ -143,7 +143,7 @@ void rspTrace(char *frmt, ... )
 	
 
 		va_end(varp);
- #endif
+#endif
 	}
 
 ///////////////////////////////////////////////////////////////////////////////

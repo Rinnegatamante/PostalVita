@@ -787,9 +787,6 @@ int main(int argc, char **argv)
 		int16_t sDeviceHeight;
 		int16_t	sUseCurrentDeviceDimensions;
 		
-		TRACE("ssefsfd\n");
-		
-		
 		prefs.GetVal("Video", "DeviceWidth", MAIN_SCREEN_MIN_WIDTH, &sDeviceWidth);
 		prefs.GetVal("Video", "DeviceHeight", MAIN_SCREEN_MIN_HEIGHT, &sDeviceHeight);
 		prefs.GetVal("Video", "UseCurrentDeviceDimensions", 1, &sUseCurrentDeviceDimensions);
