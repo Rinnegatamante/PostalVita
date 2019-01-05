@@ -33,6 +33,14 @@
 
 #include <ctype.h>
 
+#ifdef PSP2
+#include <vitasdk.h>
+#include <vita2d.h>
+vita2d_texture *gpu_buffer = nullptr;
+vita2d_texture *tex_buffer = nullptr;
+bool palette_set = false;
+#endif
+
 extern SDL_Window *sdlWindow;
 static char *sdlAppName;
 static SDL_Renderer *sdlRenderer;
@@ -666,7 +674,6 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
         //ASSERT(sDeviceHeight == 0);
         //ASSERT(sWidth == 640);
         //ASSERT(sHeight == 480);
-
         for (size_t i = 0; i < 256; i++)
             apeApp[i].a = 0xFF;
 
@@ -678,8 +685,8 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
             return -1;
         }
 
-        FramebufferWidth = sWidth;
-        FramebufferHeight = sHeight;
+        FramebufferWidth = 960/*sWidth*/;
+        FramebufferHeight = 544/*sHeight*/;
 
         mouse_grabbed = !rspCommandLine("nomousegrab");
 
@@ -740,9 +747,6 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
             exit(1);
         }
 
-
-TRACE("blah\n");
-
         SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
         SDL_RenderClear(sdlRenderer);
         SDL_RenderPresent(sdlRenderer);
@@ -754,7 +758,16 @@ TRACE("blah\n");
         SDL_RenderSetLogicalSize(sdlRenderer, FramebufferWidth, FramebufferHeight);
 		TRACE("SDL Renderer set: %ix%i\n", FramebufferWidth, FramebufferHeight);
 #endif
-        sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, FramebufferWidth, FramebufferHeight);
+
+#ifdef PSP2		
+		/*gpu_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
+		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW);*/
+		tex_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
+		PalettedTexturePointer = (uint8_t*)vita2d_texture_get_datap(tex_buffer);
+		SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof (Uint8));
+		palette_set = false;
+#else
+		sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, FramebufferWidth, FramebufferHeight);
         if (!sdlTexture)
         {
             char buf[128];
@@ -768,14 +781,16 @@ TRACE("blah\n");
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "POSTAL", buf, NULL);
             exit(1);
         }
-
-        TexturePointer = new Uint32[FramebufferWidth * FramebufferHeight];
+		
+		TexturePointer = new Uint32[FramebufferWidth * FramebufferHeight];
         PalettedTexturePointer = new Uint8[FramebufferWidth * FramebufferHeight];
         SDL_memset(TexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof (Uint32));
         SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof (Uint8));
         SDL_UpdateTexture(sdlTexture, NULL, TexturePointer, FramebufferWidth * 4);
+		
+		SDL_ShowCursor(0);
+#endif
 
-    	SDL_ShowCursor(0);
         //SDL_SetRelativeMouseMode(mouse_grabbed ? SDL_TRUE : SDL_FALSE);
 
         return 0;
@@ -833,7 +848,18 @@ extern void rspPresentFrame(void)
 {
     if (!sdlWindow) return;
 
-    // !!! FIXME: I imagine this is not fast. Maybe keep the dirty rect code at least?
+#ifdef PSP2
+	//if (!palette_set){
+	//	palette_set = true;
+		memcpy(vita2d_texture_get_palette(tex_buffer), &apeApp[0].argb, sizeof(uint32_t) * 256);
+	//}
+	vita2d_start_drawing();
+	vita2d_draw_texture(tex_buffer, 0, 0);
+	vita2d_end_drawing();
+	vita2d_wait_rendering_done();
+	vita2d_swap_buffers();
+#else
+	// !!! FIXME: I imagine this is not fast. Maybe keep the dirty rect code at least?
     ASSERT(sizeof (apeApp[0]) == sizeof (Uint32));
     const Uint8 *src = PalettedTexturePointer;
     Uint32 *dst = TexturePointer;
@@ -847,6 +873,7 @@ extern void rspPresentFrame(void)
     SDL_RenderClear(sdlRenderer);
     SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
     SDL_RenderPresent(sdlRenderer);  // off to the screen with you.
+#endif
 
     static Uint32 lastframeticks = 0;
     const Uint32 now = SDL_GetTicks();
