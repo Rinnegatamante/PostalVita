@@ -435,9 +435,7 @@ int16_t CGameSettings::LoadPrefs(
 		
 		
 	strcpy(m_pszRealmPrefsFile,"./res/levels/Postal Plus realms.ini");
-#if defined(PSP2)
-	strcpy(m_pszRealmPrefsFile, "ux0:data/postal/res/levels/Postal Plus realms.ini");
-#endif
+
 	pPrefs->GetVal("Game", "RecentDifficulty", m_sDifficulty, &m_sDifficulty);
 	if (m_sDifficulty < 0)
 		m_sDifficulty = 0;
