@@ -248,4 +248,4 @@ $(TARGET).elf: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 clean:
-	@rm -rf $(TARGET).velf $(TARGET).elf
+	@rm -rf $(TARGET).velf $(TARGET).elf $(OBJS)
