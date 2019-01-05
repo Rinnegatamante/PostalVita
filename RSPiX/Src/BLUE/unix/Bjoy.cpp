@@ -31,6 +31,7 @@
 #include "SDL.h"
 #include "Blue.h"
 #include <math.h>
+#include <vitasdk.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // Macros.
@@ -85,10 +86,13 @@ static SDL_GameController *ms_Controllers[NUM_JOYSTICKS];
 //////////////////////////////////////////////////////////////////////////////
 extern void Joy_Init(void)
 	{
-        if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) == -1)
+        if ((SDL_InitSubSystem(SDL_INIT_JOYSTICK)) || (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER)))
             return;
+
+#ifndef PSP2
         SDL_JoystickEventState(SDL_IGNORE);
         SDL_GameControllerEventState(SDL_IGNORE);
+#endif
 
         const int sticks = SDL_NumJoysticks();
         int opened = 0;
@@ -105,6 +109,9 @@ extern void Joy_Init(void)
             if (opened >= NUM_JOYSTICKS)
                 break;
         }
+#ifdef _DEBUG
+	TRACE("Joy_Init: found %i controllers\n", opened);
+#endif
 
         if (sticks && !seen)
         {
@@ -124,9 +131,9 @@ static void calcAxis(SDL_GameController *controller, const SDL_GameControllerAxi
         *bits |= posbit;
 }
 
-static inline void calcButton(SDL_GameController *controller, const SDL_GameControllerButton button, U32 *bits, const U32 posbit)
+static inline void calcButton(uint32_t buttons, uint32_t button, U32 *bits, const U32 posbit)
 {
-    if (SDL_GameControllerGetButton(controller, button) != 0)
+    if (buttons & button)
         *bits |= posbit;
 }
 
@@ -268,22 +275,26 @@ extern void rspUpdateJoy(int16_t sJoy)
 //#endif
 
         ms_ajsCurr[sJoy].u32Buttons = 0;
-        calcButton(controller, SDL_CONTROLLER_BUTTON_A, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_1);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_B, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_2);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_X, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_3);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_Y, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_4);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_BACK, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_5);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_GUIDE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_6);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_START, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_7);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_8);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_9);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_10);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_11);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_12);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_13);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_14);
-        calcButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_15);
-
+		SceCtrlData pad;
+		sceCtrlPeekBufferPositive(0, &pad, 1);
+        calcButton(pad.buttons, SCE_CTRL_CROSS, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_1);
+        calcButton(pad.buttons, SCE_CTRL_CIRCLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_2);
+        calcButton(pad.buttons, SCE_CTRL_SQUARE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_3);
+        calcButton(pad.buttons, SCE_CTRL_TRIANGLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_4);
+        calcButton(pad.buttons, SCE_CTRL_SELECT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_5);
+        //calcButton(pad.buttons, SDL_CONTROLLER_BUTTON_GUIDE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_6);
+        calcButton(pad.buttons, SCE_CTRL_START, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_7);
+        //calcButton(pad.buttons, SDL_CONTROLLER_BUTTON_LEFTSTICK, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_8);
+        //calcButton(pad.buttons, SDL_CONTROLLER_BUTTON_RIGHTSTICK, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_9);
+        calcButton(pad.buttons, SCE_CTRL_LTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_10);
+        calcButton(pad.buttons, SCE_CTRL_RTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_11);
+        calcButton(pad.buttons, SCE_CTRL_UP, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_12);
+        calcButton(pad.buttons, SCE_CTRL_DOWN, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_13);
+        calcButton(pad.buttons, SCE_CTRL_LEFT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_14);
+        calcButton(pad.buttons, SCE_CTRL_RIGHT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_15);
+#ifdef _DEBUG		
+		printf("buttons: 0x%08X\n", ms_ajsCurr[sJoy].u32Buttons);
+#endif		
 		//!! HACK
 		Sint16 TriggerLeft = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
 		Sint16 TriggerRight = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
