@@ -39,6 +39,9 @@
 vita2d_texture *gpu_buffer = nullptr;
 vita2d_texture *tex_buffer = nullptr;
 bool palette_set = false;
+bool show_credits = true;
+uint64_t credits_timer = 0;
+vita2d_pgf* credits_font = nullptr;
 #endif
 
 extern SDL_Window *sdlWindow;
@@ -544,6 +547,8 @@ extern void rspQueryVideoModeReset(void)
 #ifndef MOBILE
 		SDL_DisplayMode dm_Mode;
 		int i_Result = SDL_GetDesktopDisplayMode(0, &dm_Mode);
+		dm_Mode.w = 960;
+		dm_Mode.h = 544;
 		if (!i_Result)
 			addMode(dm_Mode.w, dm_Mode.h, 8);
 		else // Fall back to 640x480
@@ -763,9 +768,9 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 		/*gpu_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
 		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW);*/
 		tex_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
+		credits_font = vita2d_load_default_pgf();
 		PalettedTexturePointer = (uint8_t*)vita2d_texture_get_datap(tex_buffer);
 		SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof (Uint8));
-		palette_set = false;
 #else
 		sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, FramebufferWidth, FramebufferHeight);
         if (!sdlTexture)
@@ -854,7 +859,15 @@ extern void rspPresentFrame(void)
 		memcpy(vita2d_texture_get_palette(tex_buffer), &apeApp[0].argb, sizeof(uint32_t) * 256);
 	//}
 	vita2d_start_drawing();
-	vita2d_draw_texture(tex_buffer, 0, 0);
+	vita2d_draw_texture(tex_buffer, 0, 32);
+	if (show_credits) {
+		if (credits_timer == 0) credits_timer = sceKernelGetProcessTimeWide();
+		uint64_t diff_timer = sceKernelGetProcessTimeWide() - credits_timer;
+		uint8_t credits_alpha = 0xFF - diff_timer / 31372;
+		uint32_t credits_color = RGBA8(0xFF, 0xFF, 0xFF, credits_alpha);
+		if (diff_timer >  8000000) show_credits = false;
+		vita2d_pgf_draw_text(credits_font, 5, 50, credits_color, 1.0, "Thanks to my distinguished Patroners for their awesome support: XandridFire & RaveHeart");
+	}
 	vita2d_end_drawing();
 	vita2d_wait_rendering_done();
 	vita2d_swap_buffers();

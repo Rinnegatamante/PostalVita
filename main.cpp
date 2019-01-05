@@ -191,6 +191,8 @@ static int16_t SetupVideo(					// Returns 0 on success.
 	wideScreenWidth = 850;
 #elif defined(PANDORA)
 	wideScreenWidth = 800;
+#elif defined(PSP2)
+	wideScreenWidth = 960;
 #else
 	//wideScreenWidth = 640;
 

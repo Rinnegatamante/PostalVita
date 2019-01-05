@@ -49,7 +49,7 @@ extern int wideScreenWidth;
 #define MAIN_SCREEN_PAGES			1
 #define MAIN_SCREEN_SCALING		0
 
-#define MAIN_WINDOW_WIDTH			wideScreenWidth
+#define MAIN_WINDOW_WIDTH			960
 #define MAIN_WINDOW_HEIGHT			544
 
 // This is our default mode.
