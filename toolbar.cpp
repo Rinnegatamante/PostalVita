@@ -96,6 +96,32 @@
 
 extern int wideScreenWidth;
 
+#ifdef PSP2
+#include <vitasdk.h>
+double old_health = 1.0;
+uint64_t rumble_tick = 0;
+void startRumble() {
+	SceCtrlActuator handle;
+	handle.small = 100;
+	handle.large = 100;
+	sceCtrlSetActuator(1, &handle);
+	rumble_tick = sceKernelGetProcessTimeWide();
+}
+
+void stopRumble() {
+	SceCtrlActuator handle;
+	handle.small = 0;
+	handle.large = 0;
+	sceCtrlSetActuator(1, &handle);
+	rumble_tick = 0;
+}
+
+void checkRumble() {
+	if (sceKernelGetProcessTimeWide() - rumble_tick > 500000) {
+		stopRumble();
+	}
+}
+#endif
 
 extern RFont g_fontBig;	// I hope this one is OK....
 
@@ -544,7 +570,15 @@ public:
 			}
 
 		if (pDude->IsDead()) ms_aAmmo[Health].m_dValue = 0.0;
-
+		
+		#ifdef PSP2
+		if (old_health > ms_aAmmo[Health].m_dValue){
+			startRumble();
+		}
+		old_health = ms_aAmmo[Health].m_dValue;
+		checkRumble();
+		#endif
+		
 		ms_aAmmo[KevlarVest].m_dValue = double(pDude->m_stockpile.m_sKevlarLayers)/5.0;
 		//if (ms_aAmmo[KevlarVest].m_dValue > 100.0) ms_aAmmo[KevlarVest].m_dValue = 100.0;
 
