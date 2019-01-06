@@ -769,6 +769,7 @@ int main(int argc, char **argv)
 	scePowerSetBusClockFrequency(222);
 	scePowerSetGpuClockFrequency(222);
 	scePowerSetGpuXbarClockFrequency(166);
+	sceIoMkdir("ux0:data/postal/savegame", 0777);
 	#endif
 	
 	int16_t sResult = 0;
