@@ -3896,34 +3896,34 @@ static int16_t ChallengeInit(	// Returns 0 on success, non-zero to cancel menu.
 	switch (pmenuCur->u32Id)
 	{
 		case 29:
-			strcpy(challengeNames[0], GetChallengeTitle(10));
-			strcpy(challengeNames[1], GetChallengeTitle(4));
-			strcpy(challengeNames[2], GetChallengeTitle(20));
-			strcpy(challengeNames[3], GetChallengeTitle(7));
-			strcpy(challengeNames[4], GetChallengeTitle(9));
+			strcpy(challengeNames[0], "Taps");
+			strcpy(challengeNames[1], "Have a Blast");
+			strcpy(challengeNames[2], "Harvest Time");
+			strcpy(challengeNames[3], "Park Attack");
+			strcpy(challengeNames[4], "Junk Yard Countdown");
 			break;
 		case 30:
-			strcpy(challengeNames[0], GetChallengeTitle(16));
-			strcpy(challengeNames[1], GetChallengeTitle(14));
-			strcpy(challengeNames[2], GetChallengeTitle(2));
-			strcpy(challengeNames[3], GetChallengeTitle(19));
-			strcpy(challengeNames[4], GetChallengeTitle(23));
-			strcpy(challengeNames[5], GetChallengeTitle(21));
+			strcpy(challengeNames[0], "Bridge of Death");
+			strcpy(challengeNames[1], "Fire is Cool");
+			strcpy(challengeNames[2], "Take Care of These");
+			strcpy(challengeNames[3], "Working in the Mine");
+			strcpy(challengeNames[4], "Mine Fire");
+			strcpy(challengeNames[5], "Home Cookin'");
 			break;
 		case 31:
-			strcpy(challengeNames[0], GetChallengeTitle(5));
-			strcpy(challengeNames[1], GetChallengeTitle(18));
-			strcpy(challengeNames[2], GetChallengeTitle(12));
-			strcpy(challengeNames[3], GetChallengeTitle(13));
-			strcpy(challengeNames[4], GetChallengeTitle(22));
-			strcpy(challengeNames[5], GetChallengeTitle(15));
+			strcpy(challengeNames[0], "Unarmed Bridge Sprint");
+			strcpy(challengeNames[1], "Ghett the Flag");
+			strcpy(challengeNames[2], "Home Base");
+			strcpy(challengeNames[3], "Junk Yard Recovery");
+			strcpy(challengeNames[4], "Flag Hunter");
+			strcpy(challengeNames[5], "Trailer Abduction");
 			break;
 		case 32:
-			strcpy(challengeNames[0], GetChallengeTitle(6));
-			strcpy(challengeNames[1], GetChallengeTitle(8));
-			strcpy(challengeNames[2], GetChallengeTitle(3));
-			strcpy(challengeNames[3], GetChallengeTitle(17));
-			strcpy(challengeNames[4], GetChallengeTitle(11));
+			strcpy(challengeNames[0], "New Home Flag Day");
+			strcpy(challengeNames[1], "Flag Loot");
+			strcpy(challengeNames[2], "Mine Run");
+			strcpy(challengeNames[3], "Flag Parade");
+			strcpy(challengeNames[4], "Truck Stop Pit Stop");
 			break;
 		default:
 			break;

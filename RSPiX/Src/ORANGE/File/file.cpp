@@ -459,9 +459,11 @@ extern const char *FindCorrectFile(const char *_pszName, const char *pszMode)
 
     static char finalname[PATH_MAX];
     static bool bail_early = true;
-
-	if (pszName[0] == '.' && pszName[1] == '/') sprintf(finalname, "ux0:data/postal/%s", &pszName[2]);
-	else sprintf(finalname, "ux0:data/postal/%s", pszName);
+	
+	if (pszName[0] == '.' && pszName[1] == '/') {
+		if (pszName[2] == '.' && pszName[3] == '/') sprintf(finalname, "ux0:data/postal/%s", &pszName[4]);
+		else sprintf(finalname, "ux0:data/postal/%s", &pszName[2]);
+	}else sprintf(finalname, "ux0:data/postal/%s", pszName);
 
     //locateCorrectCase(finalname);
 	TRACE("finalname is \"%s\"\n", finalname);
