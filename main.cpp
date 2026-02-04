@@ -760,17 +760,27 @@ void RunSteamworksUpkeep()
 }
 #endif
 
+#ifdef __vita__
+#include <vita2d.h>
+#endif
 
 int main(int argc, char **argv)
 	{
 		
-	#ifdef PSP2
+#ifdef PSP2
 	scePowerSetArmClockFrequency(444);
 	scePowerSetBusClockFrequency(222);
 	scePowerSetGpuClockFrequency(222);
 	scePowerSetGpuXbarClockFrequency(166);
 	sceIoMkdir("ux0:data/postal/savegame", 0777);
-	#endif
+	sceAppUtilInit(&(SceAppUtilInitParam){}, &(SceAppUtilBootParam){});
+	SceCommonDialogConfigParam cmnDlgCfgParam;
+	sceCommonDialogConfigParamInit(&cmnDlgCfgParam);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, (int *)&cmnDlgCfgParam.language);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, (int *)&cmnDlgCfgParam.enterButtonAssign);
+	sceCommonDialogSetConfigParam(&cmnDlgCfgParam);
+	vita2d_init();
+#endif
 	
 	int16_t sResult = 0;
 

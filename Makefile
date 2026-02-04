@@ -6,10 +6,11 @@ INCLUDES	:= .
 
 VITASDK		:= C:\vitasdk
 
-LIBS = -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
-	-lSceAppMgr_stub -lSceCtrl_stub -lSceTouch_stub -lm -lSceAppUtil_stub -lScePgf_stub -ljpeg \
-	-lfreetype -lc -lScePower_stub -lSceCommonDialog_stub -lpng16 -lz -lSceAudio_stub -lSceGxm_stub \
-	-lSceDisplay_stub -lSceSysmodule_stub -lSDL2 -lvita2d -lSceHid_stub
+LIBS = -lSDL2 -lvita2d -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
+	-lSceAppMgr_stub -lSceCtrl_stub -lSceTouch_stub -lm -lSceAppUtil_stub -lSceAudioIn_stub \
+	-lScePgf_stub -ljpeg -lSceMotion_stub -lSceHid_stub -lSceGxm_stub \
+	-lfreetype -lc -lScePower_stub -lSceCommonDialog_stub -lpng16 -lz -lSceAudio_stub  \
+	-lSceDisplay_stub -lSceSysmodule_stub
 
 SRCS := \
 	AnimThing.o \
@@ -201,7 +202,8 @@ export INCLUDE	:= $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
 PREFIX  = arm-vita-eabi
 CC      = $(PREFIX)-gcc
 CXX      = $(PREFIX)-g++
-CFLAGS  = $(INCLUDE) -g -Wl,-q -O2 -fsigned-char -DPLATFORM_UNIX -DPSP2 -DTARGET=POSTAL_2015 -DLOCALE=US -DALLOW_TWINSTICK -w
+CFLAGS  = $(INCLUDE) -g -Wl,-q -O3 -fsigned-char -DPLATFORM_UNIX -DPSP2 -DTARGET=POSTAL_2015 -DLOCALE=US -DALLOW_TWINSTICK -w \
+	-fno-optimize-sibling-calls
 
 #CFLAGS += -DDEBUG -D_DEBUG -DRSP_DEBUG_OUT_FILE
 
@@ -231,13 +233,10 @@ ASFLAGS = $(CFLAGS)
 all: $(TARGET).vpk
 
 $(TARGET).vpk: $(TARGET).velf
-	vita-make-fself -s $< build/eboot.bin
+	vita-make-fself -s $< eboot.bin
 	vita-mksfoex -s TITLE_ID=$(TITLE) "$(TARGET)" param.sfo
-	cp -f param.sfo build/sce_sys/param.sfo
-	
-	#------------ Comment this if you don't have 7zip ------------------
-	7z a -tzip ./$(TARGET).vpk -r ./build/sce_sys ./build/eboot.bin
-	#-------------------------------------------------------------------
+	vita-pack-vpk -s param.sfo -b eboot.bin $(TARGET).vpk \
+		-a build/sce_sys=sce_sys
 
 %.velf: %.elf
 	cp $< $<.unstripped.elf

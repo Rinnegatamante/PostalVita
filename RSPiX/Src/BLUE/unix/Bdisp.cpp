@@ -39,7 +39,6 @@
 vita2d_texture *gpu_buffer = nullptr;
 vita2d_texture *tex_buffer = nullptr;
 bool palette_set = false;
-bool show_credits = true;
 uint64_t credits_timer = 0;
 vita2d_pgf* credits_font = nullptr;
 #endif
@@ -714,7 +713,8 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 
         const char *title = sdlAppName ? sdlAppName : "";
         sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sWidth, sHeight, SDL_WINDOW_FULLSCREEN);
-        if (!sdlWindow)
+#ifndef __vita__        
+		if (!sdlWindow)
         {
             char buf[128];
             SDL_snprintf(buf, sizeof (buf), "Couldn't create window: %s.", SDL_GetError());
@@ -726,7 +726,7 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 		int w = 0, h = 0;
 		SDL_GetWindowSize(sdlWindow, &w, &h);
 		TRACE("SDL Window initialized at %ix%i\n", w, h);
-
+#endif
         bool bRequestedRenderer = true;
         if (rspCommandLine("direct3d"))
             sdlRenderer = createRendererByName(sdlWindow, "direct3d");
@@ -739,7 +739,7 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
             bRequestedRenderer = false;
             sdlRenderer = createRendererByName(sdlWindow, NULL);
         }
-
+#ifndef __vita__   
         if (!sdlRenderer)
         {
             char buf[128];
@@ -762,6 +762,7 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 #ifndef MOBILE //Need to remove this for the mouse point to be in the correct place, Android And IOS
         SDL_RenderSetLogicalSize(sdlRenderer, FramebufferWidth, FramebufferHeight);
 		TRACE("SDL Renderer set: %ix%i\n", FramebufferWidth, FramebufferHeight);
+#endif
 #endif
 
 #ifdef PSP2		
@@ -860,14 +861,6 @@ extern void rspPresentFrame(void)
 	//}
 	vita2d_start_drawing();
 	vita2d_draw_texture(tex_buffer, 0, 32);
-	if (show_credits) {
-		if (credits_timer == 0) credits_timer = sceKernelGetProcessTimeWide();
-		uint64_t diff_timer = sceKernelGetProcessTimeWide() - credits_timer;
-		uint8_t credits_alpha = 0xFF - diff_timer / 31372;
-		uint32_t credits_color = RGBA8(0xFF, 0xFF, 0xFF, credits_alpha);
-		if (diff_timer >  8000000) show_credits = false;
-		vita2d_pgf_draw_text(credits_font, 5, 50, credits_color, 1.0, "Thanks to my distinguished Patroners for their awesome support: XandridFire & RaveHeart");
-	}
 	vita2d_end_drawing();
 	vita2d_wait_rendering_done();
 	vita2d_swap_buffers();
