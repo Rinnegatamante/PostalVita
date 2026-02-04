@@ -850,6 +850,24 @@ extern void rspCacheDirtyRect(
 {
 }
 
+void ascii2utf(uint16_t* dst, char* src){
+	if(!src || !dst)return;
+	while(*src)*(dst++)=(*src++);
+	*dst=0x00;
+}
+
+void utf2ascii(char* dst, uint16_t* src){
+	if(!src || !dst)return;
+	while(*src)*(dst++)=(*(src++))&0xFF;
+	*dst=0x00;
+}
+
+static uint16_t title[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
+static uint16_t initial_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
+static uint16_t input_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
+char title_keyboard[256] = {};
+char cheat_input[256] = {};
+
 extern void rspPresentFrame(void)
 {
     if (!sdlWindow) return;
@@ -860,9 +878,49 @@ extern void rspPresentFrame(void)
 		memcpy(vita2d_texture_get_palette(tex_buffer), &apeApp[0].argb, sizeof(uint32_t) * 256);
 	//}
 	vita2d_start_drawing();
+	vita2d_clear_screen();
 	vita2d_draw_texture(tex_buffer, 0, 32);
 	vita2d_end_drawing();
 	vita2d_wait_rendering_done();
+	
+	static bool show_kb = false;
+	if (show_kb) {
+		vita2d_common_dialog_update();
+		if (sceImeDialogGetStatus() == SCE_COMMON_DIALOG_STATUS_FINISHED) {
+			SceCommonDialogStatus status = sceImeDialogGetStatus();
+			SceImeDialogResult result;
+			memset(&result, 0, sizeof(SceImeDialogResult));
+			sceImeDialogGetResult(&result);
+			if (result.button == SCE_IME_DIALOG_BUTTON_ENTER)
+			{
+				utf2ascii(cheat_input, input_text);
+			}
+			sceImeDialogTerm();
+			show_kb = false;
+		}
+	} else {
+		SceTouchData touch;
+		sceTouchPeek(SCE_TOUCH_PORT_FRONT, &touch, 1);
+		show_kb = touch.reportNum > 0;
+		if (show_kb) {
+			memset(input_text, 0, (SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1) << 1);
+			memset(initial_text, 0, (SCE_IME_DIALOG_MAX_TEXT_LENGTH) << 1);
+			sprintf(title_keyboard, "Insert cheatcode");
+			ascii2utf(title, title_keyboard);
+			SceImeDialogParam param;
+			sceImeDialogParamInit(&param);
+			param.supportedLanguages = 0x0001FFFF;
+			param.languagesForced = SCE_TRUE;
+			param.type = SCE_IME_TYPE_BASIC_LATIN;
+			param.title = title;
+			param.maxTextLength = SCE_IME_DIALOG_MAX_TEXT_LENGTH;
+			param.initialText = initial_text;
+			param.inputTextBuffer = input_text;
+			sceImeDialogInit(&param);
+			vita2d_common_dialog_update();
+		}
+	}
+	
 	vita2d_swap_buffers();
 #else
 	// !!! FIXME: I imagine this is not fast. Maybe keep the dirty rect code at least?

@@ -285,6 +285,8 @@ typedef struct
 	int16_t	sCurrentIndex;
 	} Cheat;
 
+extern char cheat_input[256];
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables/data
 ////////////////////////////////////////////////////////////////////////////////
@@ -587,6 +589,8 @@ extern void ClearLocalInput(void)
 		}
 	}
 
+#include <vitasdk.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Look for cheat combos.
@@ -597,6 +601,53 @@ static void FindCheatCombos(	// Returns nothing.
 										// Out: Input with cheats.
 	RInputEvent* pie)				// In:  Latest input event or NULL.
 	{
+#ifdef __vita__
+	if (cheat_input[0]) {
+		if ((!strcmp(cheat_input, "BEER")) || (!strcmp(cheat_input, "HEALTHFUL"))) {
+			(*pinput)	|= INPUT_CHEAT_11;
+		} else if ((!strcmp(cheat_input, "VEST")) || (!strcmp(cheat_input, "THICKSKIN"))) {
+			(*pinput)	|= INPUT_CHEAT_12;
+		} else if ((!strcmp(cheat_input, "PACK")) || (!strcmp(cheat_input, "CARRYMORE"))) {
+			(*pinput)	|= INPUT_CHEAT_13;
+		} else if ((!strcmp(cheat_input, "STUFF")) || (!strcmp(cheat_input, "GIMMEDAT")) || (!strcmp(cheat_input, "MEGASTUFF"))) {
+			(*pinput)	|= INPUT_CHEAT_14;
+		} else if ((!strcmp(cheat_input, "REVIVE")) || (!strcmp(cheat_input, "HESTILLGOOD")) || (!strcmp(cheat_input, "GETUPROGUE"))) {
+			(*pinput)	|= INPUT_CHEAT_15;
+		} else if (!strcmp(cheat_input, "DAWHOLEENCHILADA")) {
+			(*pinput)	|= INPUT_CHEAT_16;
+		} else if (!strcmp(cheat_input, "BREAKYOSAK")) {
+			(*pinput)	|= INPUT_CHEAT_17;
+		} else if (!strcmp(cheat_input, "MYTEAMOUSE")) {
+			(*pinput)	|= INPUT_CHEAT_18;
+		} else if ((!strcmp(cheat_input, "SHELLS")) || (!strcmp(cheat_input, "SHELLFEST"))) {
+			(*pinput)	|= INPUT_CHEAT_19;
+		} else if ((!strcmp(cheat_input, "BOOM")) || (!strcmp(cheat_input, "EXPLODARAMA"))) {
+			(*pinput)	|= INPUT_CHEAT_20;
+		} else if ((!strcmp(cheat_input, "FLAMAGE")) || (!strcmp(cheat_input, "FLAMENSTEIN"))) {
+			(*pinput)	|= INPUT_CHEAT_21;
+		} else if (!strcmp(cheat_input, "SHOTGUN")) {
+			(*pinput)	|= INPUT_CHEAT_22;
+		} else if ((!strcmp(cheat_input, "CANNON")) || (!strcmp(cheat_input, "THEBESTGUN"))) {
+			(*pinput)	|= INPUT_CHEAT_23;
+		} else if ((!strcmp(cheat_input, "LOBBERS")) || (!strcmp(cheat_input, "LOBITFAR"))) {
+			(*pinput)	|= INPUT_CHEAT_24;
+		} else if ((!strcmp(cheat_input, "MISSILES")) || (!strcmp(cheat_input, "TITANIII"))) {
+			(*pinput)	|= INPUT_CHEAT_25;
+		} else if ((!strcmp(cheat_input, "NAPALM")) || (!strcmp(cheat_input, "STERNOMAT"))) {
+			(*pinput)	|= INPUT_CHEAT_26;
+		} else if ((!strcmp(cheat_input, "FLAMER")) || (!strcmp(cheat_input, "FIREHURLER"))) {
+			(*pinput)	|= INPUT_CHEAT_27;
+		} else if ((!strcmp(cheat_input, "MINES")) || (!strcmp(cheat_input, "CROTCHBOMB"))) {
+			(*pinput)	|= INPUT_CHEAT_28;
+		} else if ((!strcmp(cheat_input, "NEXT")) || (!strcmp(cheat_input, "SELL")) || (!strcmp(cheat_input, "THERESNOPLACELIKEOZ"))) {
+			(*pinput)	|= INPUT_CHEAT_29;
+		} else if ((!strcmp(cheat_input, "GAWD")) || (!strcmp(cheat_input, "IAMSOLAME"))) {
+			(*pinput)	|= INPUT_CHEAT_30;
+		}
+
+		cheat_input[0] = 0;
+	}
+#else
 	int32_t		lNow		= rspGetMilliseconds();
 	int16_t	i;
 
@@ -650,6 +701,7 @@ static void FindCheatCombos(	// Returns nothing.
 				}
 			}
 		}
+#endif
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
