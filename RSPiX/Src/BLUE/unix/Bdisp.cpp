@@ -766,8 +766,8 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 #endif
 
 #ifdef PSP2		
-		/*gpu_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
-		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW);*/
+		/*gpu_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);*/
+		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW);
 		tex_buffer = vita2d_create_empty_texture_format(FramebufferWidth, FramebufferHeight, SCE_GXM_TEXTURE_FORMAT_P8_ARGB);
 		credits_font = vita2d_load_default_pgf();
 		PalettedTexturePointer = (uint8_t*)vita2d_texture_get_datap(tex_buffer);
