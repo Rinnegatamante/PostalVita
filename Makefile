@@ -4,13 +4,14 @@ SRCDIR		:= .
 BINDIR  	:= ./bin
 INCLUDES	:= .
 
-VITASDK		:= C:\vitasdk
+PKG_CONFIG ?= arm-vita-eabi-pkg-config
+SDL_LIBS := $(shell $(PKG_CONFIG) --static --libs sdl2)
 
-LIBS = -lSDL2 -lvita2d -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
+LIBS = $(SDL_LIBS) -lSDL2 -lvita2d -lmikmod -lvorbisfile -lvorbis -logg -lsndfile -lSceLibKernel_stub -lScePvf_stub \
 	-lSceAppMgr_stub -lSceCtrl_stub -lSceTouch_stub -lm -lSceAppUtil_stub -lSceAudioIn_stub \
 	-lScePgf_stub -ljpeg -lSceMotion_stub -lSceHid_stub -lSceGxm_stub \
 	-lfreetype -lc -lScePower_stub -lSceCommonDialog_stub -lpng16 -lz -lSceAudio_stub  \
-	-lSceDisplay_stub -lSceSysmodule_stub
+	-lSceDisplay_stub -lSceSysmodule_stub -lSceShaccCgExt -ltaihen_stub
 
 SRCS := \
 	AnimThing.o \
@@ -244,7 +245,7 @@ $(TARGET).vpk: $(TARGET).velf
 	vita-elf-create $< $@
 
 $(TARGET).elf: $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
+	$(CXX) $(CXXFLAGS) -pthread $^ $(LDFLAGS) $(LIBS) -o $@
 
 clean:
 	@rm -rf $(TARGET).velf $(TARGET).elf $(OBJS)
